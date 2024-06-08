@@ -1,0 +1,120 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "Eventhings Recommendation API",
+    "description": "Api Documentation for Eventhings Recommendation",
+    "contact": {}
+  },
+  "basePath": "/",
+  "securityDefinitions": {},
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/recommendation": {
+      "post": {
+        "description": "Get data recommendation",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Event Service Recommendations"
+        ],
+        "parameters": [
+          {
+            "name": "index",
+            "in": "body",
+            "description": "JSON data for the api",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IdexInput"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/Response"
+            }
+          },
+          "400": {
+            "description": "invalid request data"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "IdexInput": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer"
+        }
+      }
+    },
+    "DataIndex": {
+      "type": "object",
+      "properties": {
+        "deskripsi": {
+          "type": "string"
+        },
+        "location/city": {
+          "type": "string"
+        },
+        "nama": {
+          "type": "string"
+        },
+        "subkategori": {
+          "type": "string"
+        }
+      }
+    },
+    "DataRecommendation": {
+      "type": "object",
+      "properties": {
+        "deskripsi": {
+          "type": "string",
+          "nullable": true
+        },
+        "location/city": {
+          "type": "string"
+        },
+        "nama": {
+          "type": "string"
+        },
+        "subkategori": {
+          "type": "string"
+        }
+      }
+    },
+    "Response": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "status_code": {
+          "type": "integer"
+        },
+        "data_index": {
+          "$ref": "#/definitions/DataIndex"
+        },
+        "data_recommendation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DataRecommendation"
+          }
+        }
+      }
+    }
+  }
+}

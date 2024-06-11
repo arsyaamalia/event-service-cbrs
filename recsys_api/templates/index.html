@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Eventhings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Poppins:300,500&amp;display=swap'>
+  <style>
+    body {
+      margin-top: 7vh;
+      font-family: "Poppins", sans-serif;
+      font-weight: 300;
+      font-size: 100%;
+      background-color: #f7f7f7;
+      line-height: 1.5;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2em;
+      color: #333;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+    input[type="submit"] {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: #fff;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    input[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+    .company-list {
+      margin-top: 20px;
+    }
+    .company {
+      margin-bottom: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #fafafa;
+    }
+    .company h3 {
+      margin-top: 0;
+      font-size: 1.5em;
+      color: #007BFF;
+    }
+    .company p {
+      margin: 5px 0;
+    }
+    .company-link {
+      color: #007BFF;
+      text-decoration: none;
+    }
+    .company-link:hover {
+      text-decoration: underline;
+    }
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .company-description {
+      text-align: justify;
+    }
+    .page-link {
+      margin: 0 5px;
+      cursor: pointer;
+      color: #007BFF;
+      text-decoration: none;
+    }
+    .page-link:hover {
+      text-decoration: underline;
+    }
+    #suggestions {
+      border: 1px solid #ccc;
+      max-height: 150px;
+      overflow-y: auto;
+      position: absolute;
+      width: inherit;
+      background: white;
+      z-index: 1000;
+      border-radius: 0 0 5px 5px;
+    }
+    .suggestion-item {
+      padding: 10px;
+      cursor: pointer;
+    }
+    .suggestion-item:hover {
+      background-color: #f0f0f0;
+    }
+    .creds {
+      text-align: center;
+      margin-top: 20px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2><u>Selamat Datang di Eventhings!</u></h2>
+    <div class="company">
+      <form action="/" method="GET">
+        <input type="text" id="company_name" name="query" placeholder="Cari perusahaan" autocorrect="off" autocapitalize="off" autocomplete="off" value="{{ query }}" />
+        <div id="suggestions"></div>
+        <input type="submit" value="Cari" />
+      </form>
+      <div id="company_list" class="company-list">
+        {% for company in companies %}
+        <div class="company">
+          <h3><a href="/company-detail-and-recommendation/{{ company.idx }}" class="company-link">{{ company.nama }}</a></h3>
+          <p><strong>Subkategori:</strong> {{ company.subkategori }}</p>
+          <p><strong>Lokasi:</strong> {{ company.location }}</p>
+          <p class="company-description"><strong>Deskripsi:</strong> {{ company.deskripsi }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="pagination">
+        {% if page > 1 %}
+        <a class="page-link" href="?page={{ page - 1 }}&query={{ query }}"><<<</a>
+        {% endif %}
+        {{ page }} dari {{ total_pages }}
+        {% if page < total_pages %}
+        <a class="page-link" href="?page={{ page + 1 }}&query={{ query }}">>>></a>
+        {% endif %}
+      </div>
+    </div>
+    <p class="creds">Eventhings © 2024</p>
+  </div>
+  <script src='https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js'></script>
+  <script>
+    $(document).ready(function() {
+      $('#company_name').on('input', function() {
+        var query = $(this).val();
+        var suggestions = $('#suggestions');
+        if (query.length > 0) {
+          $.ajax({
+            url: '/suggest',
+            data: { query: query },
+            success: function(data) {
+              suggestions.empty();
+              data.forEach(function(item) {
+                suggestions.append('<div class="suggestion-item">' + item + '</div>');
+              });
+              $('.suggestion-item').on('click', function() {
+                $('#company_name').val($(this).text());
+                suggestions.empty();
+              });
+              // Posisi elemen suggestions tepat di bawah company_name
+              var position = $('#company_name').position();
+              suggestions.css({
+                top: position.top + $('#company_name').outerHeight(),
+                left: position.left,
+                width: $('#company_name').outerWidth() // Menyesuaikan lebar
+              }).show();
+            }
+          });
+        } else {
+          suggestions.empty().hide();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

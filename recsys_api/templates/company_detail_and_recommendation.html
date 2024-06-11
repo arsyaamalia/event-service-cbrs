@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ company.nama }} - Eventhings</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Poppins:300,500&amp;display=swap'>
+  <style>
+    body {
+      margin-top: 7vh;
+      font-family: "Poppins", sans-serif;
+      font-weight: 300;
+      font-size: 100%;
+      background-color: #f7f7f7;
+      line-height: 1.5;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      position: relative;
+    }
+    .back-home {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+    .back-home a {
+      color: #007BFF;
+      text-decoration: none;
+      font-size: 0.9em;
+      padding: 5px 10px;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .back-home a:hover {
+      background-color: #e0e0e0;
+    }
+    .company-info {
+      margin-top: 50px; /* Adjusted margin to create space */
+      margin-bottom: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #fafafa;
+    }
+    .company-info h2 {
+      margin-bottom: 20px;
+      font-size: 2em;
+      color: #333;
+      font-weight: 500;
+      text-align: center;
+    }
+    .company-info p {
+      margin: 5px 0;
+      font-size: 1em;
+      color: #555;
+    }
+    .company-info strong {
+      color: #007BFF;
+    }
+    .company-description {
+      text-align: justify;
+    }
+    .company-list {
+      margin-top: 20px;
+    }
+    .company {
+      margin-bottom: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #fafafa;
+    }
+    .company p {
+      margin: 5px 0;
+    }
+    .company a {
+      color: #007BFF;
+      text-decoration: none;
+    }
+    .company a:hover {
+      text-decoration: underline;
+    }
+    .creds {
+      text-align: center;
+      margin-top: 20px;
+      color: #888;
+    }
+    .recommendation-title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.25em;
+      color: #555;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: 400;
+    }
+    .load-more-btn {
+      text-align: center;
+      margin-top: 20px;
+    }
+    #load-more-btn {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="back-home">
+      <a href="/">Beranda</a>
+    </div>
+
+    <div class="company-info" data-index="{{ company_idx }}">
+      <h2>{{ company.nama }}</h2>
+      <p><strong>Subkategori:</strong> {{ company.subkategori }}</p>
+      <p><strong>Lokasi:</strong> {{ company.location }}</p>
+      <p class="company-description"><strong>Deskripsi:</strong> {{ company.deskripsi }}</p>
+    </div>
+
+    <div class="recommendations">
+      <div class="recommendation-title">Rekomendasi perusahaan yang cocok untuk Anda</div>
+      <div class="company-list">
+        {% for reco in recommendations %}
+        <div class="company" data-idx="{{ reco.idx }}">
+          <h3><a href="/company-detail-and-recommendation/{{ reco.idx }}">{{ reco.nama }}</a></h3>
+          <p><strong>Subkategori:</strong> {{ reco.subkategori }}</p>
+          <p><strong>Lokasi:</strong> {{ reco.location }}</p>
+          <p class="company-description"><strong>Deskripsi:</strong> {{ reco.deskripsi }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="load-more-btn">
+        <button id="load-more-btn">Lihat lebih banyak rekomendasi</button>
+      </div>
+    </div>
+    <p class="creds">Eventhings © 2024</p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var loadMoreBtn = document.getElementById('load-more-btn');
+      var currentPage = 2; // Dimulai dari halaman 2 karena halaman pertama sudah dimuat
+
+      loadMoreBtn.addEventListener('click', function() {
+        var lastIdx = document.querySelector('.company-info').dataset.index;
+        fetch('/more-recommendation/' + lastIdx + '?page=' + currentPage)
+          .then(response => response.json())
+          .then(data => {
+            var companyList = document.querySelector('.company-list');
+            data.recommendations.forEach(reco => {
+              var companyDiv = document.createElement('div');
+              companyDiv.className = 'company';
+              companyDiv.dataset.idx = reco.index;
+              companyDiv.innerHTML = `
+                <h3><a href="/company-detail-and-recommendation/${reco.idx}">${reco.nama}</a></h3>
+                <p><strong>Subkategori:</strong> ${reco.subkategori}</p>
+                <p><strong>Lokasi:</strong> ${reco.location}</p>
+                <p class="company-description"><strong>Deskripsi:</strong> ${reco.deskripsi}</p>
+              `;
+              companyList.appendChild(companyDiv);
+            });
+            currentPage++; // Increment page number for the next request
+          })
+          .catch(error => console.error('Error:', error));
+      });
+    });
+  </script>
+</body>
+</html>

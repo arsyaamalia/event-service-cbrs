@@ -91,7 +91,7 @@ def home():
     start = (page - 1) * per_page
     end = start + per_page
     paginated_data = filtered_data.iloc[start:end]
-    print(paginated_data)
+    # print(paginated_data)
 
     return render_template('index.html', 
                            companies=paginated_data.to_dict(orient='records'), 
@@ -119,7 +119,7 @@ def company_detail(idx):
     return render_template('company_detail_and_recommendation.html', 
                            company=company, 
                            recommendations=recommendations,
-                           company_id=idx)
+                           company_idx=df.iloc[idx][['idx']].tolist()[0])
 
 @app.route('/more-recommendation/<int:idx>')
 def load_more_companies(idx):

@@ -163,7 +163,7 @@
             data.recommendations.forEach(reco => {
               var companyDiv = document.createElement('div');
               companyDiv.className = 'company';
-              companyDiv.dataset.idx = reco.index;
+              companyDiv.dataset.idx = reco.idx;
               companyDiv.innerHTML = `
                 <h3><a href="/company-detail-and-recommendation/${reco.idx}">${reco.nama}</a></h3>
                 <p><strong>Subkategori:</strong> ${reco.subkategori}</p>
